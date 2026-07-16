@@ -2,6 +2,7 @@ node_modules
 dist
 .env
 *.log
+*.tsbuildinfo
 
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
