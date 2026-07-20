@@ -1,102 +1,65 @@
-import { PrismaClient, PlayerType } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const ACHIEVEMENTS = [
-  { code: "50_GOALS", name: "Matador", description: "Marcou 50 gols pela patota", icon: "target" },
-  { code: "50_ASSISTS", name: "Garçom", description: "Deu 50 assistências pela patota", icon: "hand-heart" },
-  { code: "20_PRESENCES", name: "Presença Garantida", description: "Compareceu a 20 jogos", icon: "calendar-check" },
-  { code: "10_MVP", name: "Craque da Galera", description: "Foi eleito MVP 10 vezes", icon: "trophy" },
-  { code: "10_TOP_SCORER", name: "Artilheiro Nato", description: "Foi eleito melhor marcador 10 vezes", icon: "crosshair" },
-  { code: "10_BEST_GK", name: "Paredão", description: "Foi eleito melhor goleiro 10 vezes", icon: "shield" },
-  { code: "VETERAN", name: "Veterano", description: "Mais de 1 ano de patota", icon: "medal" },
-  { code: "PUNCTUAL_PAYER", name: "Pagador Pontual", description: "6 meses seguidos com mensalidade em dia", icon: "credit-card" },
-];
-
-const SAMPLE_PLAYERS: Array<{
-  name: string;
-  nickname: string;
-  whatsapp: string;
-  type: PlayerType;
-  overall: number;
-  withLogin?: boolean;
-}> = [
-  { name: "Carlos Eduardo Souza", nickname: "Cadu", whatsapp: "5511990000001", type: "LINHA", overall: 78, withLogin: true },
-  { name: "Bruno Alves Lima", nickname: "Bruninho", whatsapp: "5511990000002", type: "LINHA", overall: 72 },
-  { name: "Diego Ferreira", nickname: "Digão", whatsapp: "5511990000003", type: "LINHA", overall: 65 },
-  { name: "Felipe Martins", nickname: "Felipão", whatsapp: "5511990000004", type: "LINHA", overall: 80 },
-  { name: "Gustavo Rocha", nickname: "Guga", whatsapp: "5511990000005", type: "LINHA", overall: 60 },
-  { name: "Henrique Costa", nickname: "Rique", whatsapp: "5511990000006", type: "LINHA", overall: 70 },
-  { name: "Igor Nascimento", nickname: "Igão", whatsapp: "5511990000007", type: "LINHA", overall: 55 },
-  { name: "João Pedro Almeida", nickname: "JP", whatsapp: "5511990000008", type: "LINHA", overall: 68 },
-  { name: "Lucas Barbosa", nickname: "Lucão", whatsapp: "5511990000009", type: "LINHA", overall: 74 },
-  { name: "Marcelo Dias", nickname: "Marcelinho", whatsapp: "5511990000010", type: "LINHA", overall: 62 },
-  { name: "Rafael Teixeira", nickname: "Rafa", whatsapp: "5511990000011", type: "LINHA", overall: 58 },
-  { name: "Thiago Ramos", nickname: "Thiaguinho", whatsapp: "5511990000012", type: "LINHA", overall: 66 },
-  { name: "Vinícius Pereira", nickname: "Vini", whatsapp: "5511990000013", type: "GOLEIRO", overall: 75 },
-  { name: "William Santos", nickname: "Willão", whatsapp: "5511990000014", type: "GOLEIRO", overall: 63 },
-];
-
 async function main() {
   console.log("Seeding banco de dados...");
 
-  for (const achievement of ACHIEVEMENTS) {
-    await prisma.achievement.upsert({
-      where: { code: achievement.code },
-      update: {},
-      create: achievement,
-    });
-  }
-
-  const adminPasswordHash = await bcrypt.hash("admin123", 10);
-  await prisma.user.upsert({
-    where: { email: "admin@patotabecker.com" },
+  // Cria ou atualiza as patotas
+  await prisma.patota.upsert({
+    where: { id: "patota-becker-001" },
     update: {},
     create: {
-      email: "admin@patotabecker.com",
-      passwordHash: adminPasswordHash,
-      role: "ADMIN",
+      id: "patota-becker-001",
+      name: "Patota Becker",
     },
   });
 
-  const playerPasswordHash = await bcrypt.hash("jogador123", 10);
+  await prisma.patota.upsert({
+    where: { id: "patota-segunda-001" },
+    update: {},
+    create: {
+      id: "patota-segunda-001",
+      name: "Patota de Segunda",
+    },
+  });
 
-  for (const p of SAMPLE_PLAYERS) {
-    const overallVariance = Math.floor(p.overall * 0.6);
-    const player = await prisma.player.create({
-      data: {
-        name: p.name,
-        nickname: p.nickname,
-        whatsapp: p.whatsapp,
-        type: p.type,
-        status: "ATIVO",
-        overall: p.overall,
-        attack: p.type === "GOLEIRO" ? 40 : overallVariance,
-        passing: overallVariance,
-        defense: p.type === "GOLEIRO" ? p.overall : overallVariance,
-        participation: overallVariance,
-        presenceAttr: overallVariance,
-        physical: overallVariance,
-      },
-    });
+  const adminHash = await bcrypt.hash("admin123", 10);
 
-    if (p.withLogin) {
-      const email = `${p.nickname.toLowerCase().replace(/[^a-z0-9]/g, "")}@patotabecker.com`;
-      await prisma.user.create({
-        data: {
-          email,
-          passwordHash: playerPasswordHash,
-          role: "JOGADOR",
-          playerId: player.id,
-        },
-      });
-    }
-  }
+  // Admin da Patota Becker
+  await prisma.user.upsert({
+    where: { email: "admin@patotabecker.com" },
+    update: { patotaId: "patota-becker-001" },
+    create: {
+      email: "admin@patotabecker.com",
+      passwordHash: adminHash,
+      role: "ADMIN",
+      patotaId: "patota-becker-001",
+    },
+  });
 
-  console.log("Seed concluído.");
-  console.log("Login admin: admin@patotabecker.com / admin123");
-  console.log("Login jogador exemplo: cadu@patotabecker.com / jogador123");
+  // Admin da Patota de Segunda
+  await prisma.user.upsert({
+    where: { email: "admin@patotasegunda.com" },
+    update: { patotaId: "patota-segunda-001" },
+    create: {
+      email: "admin@patotasegunda.com",
+      passwordHash: adminHash,
+      role: "ADMIN",
+      patotaId: "patota-segunda-001",
+    },
+  });
+
+  // Garante que todos os usuários existentes da Patota Becker tenham patotaId
+  await prisma.user.updateMany({
+    where: { patotaId: null },
+    data: { patotaId: "patota-becker-001" },
+  });
+
+  console.log("Seed concluído!");
+  console.log("Admin Patota Becker: admin@patotabecker.com / admin123");
+  console.log("Admin Patota de Segunda: admin@patotasegunda.com / admin123");
 }
 
 main()
