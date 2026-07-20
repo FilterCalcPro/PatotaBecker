@@ -54,6 +54,19 @@ enum VoteCategory {
   GOLEIRO
 }
 
+model Patota {
+  id        String   @id
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+  players   Player[]
+  guests    Guest[]
+  matches   Match[]
+  transactions Transaction[]
+  waitlist  WaitlistEntry[]
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -61,7 +74,10 @@ model User {
   role         Role     @default(JOGADOR)
   playerId     String?  @unique
   player       Player?  @relation(fields: [playerId], references: [id])
+  patotaId     String   @default("patota-becker-001")
+  patota       Patota   @relation(fields: [patotaId], references: [id])
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Player {
@@ -74,7 +90,6 @@ model Player {
   status        PlayerStatus @default(ATIVO)
   joinedAt      DateTime     @default(now())
   inactiveSince DateTime?
-
   overall       Int @default(50)
   attack        Int @default(50)
   passing       Int @default(50)
@@ -82,7 +97,8 @@ model Player {
   participation Int @default(50)
   presenceAttr  Int @default(50)
   physical      Int @default(50)
-
+  patotaId      String @default("patota-becker-001")
+  patota        Patota @relation(fields: [patotaId], references: [id])
   user            User?
   attendances     Attendance[]
   teamMemberships TeamPlayer[]
@@ -93,7 +109,6 @@ model Player {
   achievements    PlayerAchievement[]
   overallHistory  OverallHistory[]
   notifications   Notification[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -103,6 +118,8 @@ model Guest {
   name            String
   whatsapp        String?
   defaultFee      Float?
+  patotaId        String @default("patota-becker-001")
+  patota          Patota @relation(fields: [patotaId], references: [id])
   matches         MatchGuest[]
   teamMemberships TeamPlayer[]
   matchStats      PlayerMatchStat[]
@@ -117,6 +134,8 @@ model Match {
   courtCost   Float
   format      MatchFormat
   closed      Boolean           @default(false)
+  patotaId    String @default("patota-becker-001")
+  patota      Patota @relation(fields: [patotaId], references: [id])
   attendances Attendance[]
   teams       Team[]
   guests      MatchGuest[]
@@ -134,7 +153,6 @@ model MatchGuest {
   guest   Guest   @relation(fields: [guestId], references: [id], onDelete: Cascade)
   fee     Float
   paid    Boolean @default(false)
-
   @@unique([matchId, guestId])
 }
 
@@ -147,7 +165,6 @@ model Attendance {
   status      AttendanceStatus  @default(PENDENTE)
   attended    Boolean           @default(false)
   respondedAt DateTime?
-
   @@unique([matchId, playerId])
 }
 
@@ -167,121 +184,4 @@ model TeamPlayer {
   playerId String?
   player   Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
   guestId  String?
-  guest    Guest?  @relation(fields: [guestId], references: [id], onDelete: Cascade)
-
-  @@unique([teamId, playerId])
-  @@unique([teamId, guestId])
-}
-
-model PlayerMatchStat {
-  id       String  @id @default(cuid())
-  matchId  String
-  match    Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  playerId String?
-  player   Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  guestId  String?
-  guest    Guest?  @relation(fields: [guestId], references: [id], onDelete: Cascade)
-  goals    Int     @default(0)
-  assists  Int     @default(0)
-
-  @@unique([matchId, playerId])
-  @@unique([matchId, guestId])
-}
-
-model MatchResult {
-  id         String @id @default(cuid())
-  matchId    String @unique
-  match      Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  teamAName  String
-  teamAGoals Int
-  teamBName  String
-  teamBGoals Int
-}
-
-model Vote {
-  id          String       @id @default(cuid())
-  matchId     String
-  match       Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  voterId     String
-  voter       Player       @relation("VoterVotes", fields: [voterId], references: [id], onDelete: Cascade)
-  category    VoteCategory
-  candidateId String
-  candidate   Player       @relation("CandidateVotes", fields: [candidateId], references: [id], onDelete: Cascade)
-  rank        Int?
-
-  @@unique([matchId, voterId, category, rank])
-}
-
-model MonthlyFee {
-  id             String         @id @default(cuid())
-  playerId       String
-  player         Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  referenceMonth String
-  amount         Float
-  status         PaymentStatus  @default(ABERTO)
-  method         PaymentMethod?
-  paidAt         DateTime?
-  createdAt      DateTime       @default(now())
-
-  @@unique([playerId, referenceMonth])
-}
-
-model Transaction {
-  id          String          @id @default(cuid())
-  type        TransactionType
-  category    String
-  description String
-  amount      Float
-  date        DateTime        @default(now())
-  createdAt   DateTime        @default(now())
-}
-
-model WaitlistEntry {
-  id        String   @id @default(cuid())
-  name      String
-  whatsapp  String
-  city      String
-  position  Int
-  approved  Boolean  @default(false)
-  createdAt DateTime @default(now())
-}
-
-model Achievement {
-  id          String              @id @default(cuid())
-  code        String              @unique
-  name        String
-  description String
-  icon        String
-  players     PlayerAchievement[]
-}
-
-model PlayerAchievement {
-  id            String      @id @default(cuid())
-  playerId      String
-  player        Player      @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  achievementId String
-  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  unlockedAt    DateTime    @default(now())
-
-  @@unique([playerId, achievementId])
-}
-
-model Notification {
-  id        String   @id @default(cuid())
-  playerId  String
-  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  type      String
-  title     String
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-}
-
-model OverallHistory {
-  id        String   @id @default(cuid())
-  playerId  String
-  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  matchId   String?
-  overall   Int
-  createdAt DateTime @default(now())
-}
+  guest    Guest?
