@@ -21,11 +21,11 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Rodar migração do banco
-        run: flyctl ssh console -a patota-becker-api -C "cd /app && npx prisma migrate deploy"
+        run: flyctl ssh console -a patota-becker-api -C "npx prisma migrate deploy"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Rodar seed
-        run: flyctl ssh console -a patota-becker-api -C "cd /app && npx ts-node prisma/seed.ts"
+        run: flyctl ssh console -a patota-becker-api -C "npx ts-node prisma/seed.ts"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
