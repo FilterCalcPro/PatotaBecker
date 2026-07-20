@@ -20,8 +20,16 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
+      - name: Aguardar app iniciar
+        run: sleep 40
 
       - name: Rodar seed
-        run: flyctl ssh console -a patota-becker-api -C "npx tsx prisma/seed.ts"
+        continue-on-error: true
+        run: |
+          for i in 1 2 3 4 5; do
+            echo "Tentativa $i..."
+            flyctl ssh console -a patota-becker-api -C "npx tsx prisma/seed.ts" && break
+            sleep 20
+          done
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
