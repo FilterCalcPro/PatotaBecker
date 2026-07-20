@@ -6,67 +6,48 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding banco de dados...");
 
-  // Cria ou atualiza as patotas
-  await prisma.patota.upsert({
-    where: { id: "patota-becker-001" },
-    update: {},
-    create: {
-      id: "patota-becker-001",
-      name: "Patota Becker",
-    },
-  });
+  await prisma.$executeRawUnsafe(
+    `INSERT OR IGNORE INTO "Patota" (id, name, createdAt, updatedAt)
+     VALUES ('patota-becker-001', 'Patota Becker', datetime('now'), datetime('now'))`
+  );
+  await prisma.$executeRawUnsafe(
+    `INSERT OR IGNORE INTO "Patota" (id, name, createdAt, updatedAt)
+     VALUES ('patota-segunda-001', 'Patota de Segunda', datetime('now'), datetime('now'))`
+  );
 
-  await prisma.patota.upsert({
-    where: { id: "patota-segunda-001" },
-    update: {},
-    create: {
-      id: "patota-segunda-001",
-      name: "Patota de Segunda",
-    },
-  });
+  const hash = await bcrypt.hash("admin123", 10);
+  const now = new Date().toISOString();
 
-  const adminHash = await bcrypt.hash("admin123", 10);
+  await prisma.$executeRawUnsafe(
+    `INSERT OR IGNORE INTO "User" (id, email, passwordHash, role, patotaId, createdAt, updatedAt)
+     VALUES (lower(hex(randomblob(16))), 'admin@patotabecker.com', ?, 'ADMIN', 'patota-becker-001', ?, ?)`,
+    hash, now, now
+  );
+  await prisma.$executeRawUnsafe(
+    `UPDATE "User" SET patotaId = 'patota-becker-001' WHERE email = 'admin@patotabecker.com'`
+  );
 
-  // Admin da Patota Becker
-  await prisma.user.upsert({
-    where: { email: "admin@patotabecker.com" },
-    update: { patotaId: "patota-becker-001" },
-    create: {
-      email: "admin@patotabecker.com",
-      passwordHash: adminHash,
-      role: "ADMIN",
-      patotaId: "patota-becker-001",
-    },
-  });
+  await prisma.$executeRawUnsafe(
+    `INSERT OR IGNORE INTO "User" (id, email, passwordHash, role, patotaId, createdAt, updatedAt)
+     VALUES (lower(hex(randomblob(16))), 'admin@patotasegunda.com', ?, 'ADMIN', 'patota-segunda-001', ?, ?)`,
+    hash, now, now
+  );
+  await prisma.$executeRawUnsafe(
+    `UPDATE "User" SET patotaId = 'patota-segunda-001' WHERE email = 'admin@patotasegunda.com'`
+  );
 
-  // Admin da Patota de Segunda
-  await prisma.user.upsert({
-    where: { email: "admin@patotasegunda.com" },
-    update: { patotaId: "patota-segunda-001" },
-    create: {
-      email: "admin@patotasegunda.com",
-      passwordHash: adminHash,
-      role: "ADMIN",
-      patotaId: "patota-segunda-001",
-    },
-  });
-
-  // Garante que todos os usuários existentes da Patota Becker tenham patotaId
-  await prisma.user.updateMany({
-    where: { patotaId: null },
-    data: { patotaId: "patota-becker-001" },
-  });
+  await prisma.$executeRawUnsafe(
+    `UPDATE "User" SET patotaId = 'patota-becker-001' WHERE patotaId IS NULL OR patotaId = ''`
+  );
+  await prisma.$executeRawUnsafe(
+    `UPDATE "Player" SET patotaId = 'patota-becker-001' WHERE patotaId IS NULL OR patotaId = ''`
+  );
 
   console.log("Seed concluído!");
-  console.log("Admin Patota Becker: admin@patotabecker.com / admin123");
-  console.log("Admin Patota de Segunda: admin@patotasegunda.com / admin123");
+  console.log("admin@patotabecker.com / admin123");
+  console.log("admin@patotasegunda.com / admin123");
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((e) => { console.error(e); process.exit(1); })
+  .finally(() => prisma.$disconnect());
