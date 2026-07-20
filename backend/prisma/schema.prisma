@@ -184,4 +184,7 @@ model TeamPlayer {
   playerId String?
   player   Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
   guestId  String?
-  guest    Guest?
+  guest    Guest?  @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  @@unique([teamId, playerId])
+  @@unique([teamId, guestId])
+}
