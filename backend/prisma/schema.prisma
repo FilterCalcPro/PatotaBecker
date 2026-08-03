@@ -220,6 +220,7 @@ model MonthlyFee {
   amount         Float
   status         PaymentStatus  @default(ABERTO)
   method         PaymentMethod?
+  dueDate        DateTime?
   paidAt         DateTime?
   createdAt      DateTime       @default(now())
 

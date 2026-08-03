@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import * as dashboardService from "@/services/dashboard.service";
 import * as matchesService from "@/services/matches.service";
-import { formatCurrency, formatDateLong } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateLong } from "@/lib/utils";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/services/api";
 import { useQueryClient } from "@tanstack/react-query";
@@ -202,7 +202,13 @@ function PlayerDashboard({ playerId }: { playerId: string }) {
           value={data.currentMonthlyFee ? formatCurrency(data.currentMonthlyFee.amount) : "—"}
           icon={Wallet}
           tone={data.currentMonthlyFee?.status === "PAGO" ? "success" : "destructive"}
-          hint={data.currentMonthlyFee?.status === "PAGO" ? "Pago" : "Em aberto"}
+          hint={
+            data.currentMonthlyFee?.status === "PAGO"
+              ? "Pago"
+              : data.currentMonthlyFee?.dueDate
+                ? `Vence ${formatDate(data.currentMonthlyFee.dueDate)}`
+                : "Em aberto"
+          }
         />
         <StatCard label="Status" value={data.player.status === "ATIVO" ? "Ativo" : "Inativo"} icon={Users} />
       </div>

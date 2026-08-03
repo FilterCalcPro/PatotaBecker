@@ -121,23 +121,30 @@ export default function CashFlow() {
               ) : fees?.length === 0 ? (
                 <p className="py-8 text-center text-sm text-muted-foreground">Nenhuma mensalidade gerada ainda.</p>
               ) : (
-                fees?.map((fee) => (
-                  <div key={fee.id} className="flex items-center justify-between rounded-lg border border-border p-3">
-                    <div>
-                      <p className="text-sm font-medium">{fee.player?.nickname}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {fee.referenceMonth} · {formatCurrency(fee.amount)}
-                      </p>
+                fees?.map((fee) => {
+                  const overdue = fee.status === "ABERTO" && !!fee.dueDate && new Date(fee.dueDate) < new Date();
+                  return (
+                    <div key={fee.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                      <div>
+                        <p className="text-sm font-medium">{fee.player?.nickname}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {fee.referenceMonth} · {formatCurrency(fee.amount)}
+                          {fee.dueDate && ` · Vence ${formatDate(fee.dueDate)}`}
+                        </p>
+                      </div>
+                      {fee.status === "PAGO" ? (
+                        <Badge variant="success">Pago {fee.method ? `(${fee.method})` : ""}</Badge>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          {overdue && <Badge variant="destructive">Atrasada</Badge>}
+                          <Button size="sm" onClick={() => setPayingFeeId(fee.id)}>
+                            <CheckCircle2 className="h-4 w-4" /> Marcar como paga
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    {fee.status === "PAGO" ? (
-                      <Badge variant="success">Pago {fee.method ? `(${fee.method})` : ""}</Badge>
-                    ) : (
-                      <Button size="sm" onClick={() => setPayingFeeId(fee.id)}>
-                        <CheckCircle2 className="h-4 w-4" /> Marcar como paga
-                      </Button>
-                    )}
-                  </div>
-                ))
+                  );
+                })
               )}
             </CardContent>
           </Card>

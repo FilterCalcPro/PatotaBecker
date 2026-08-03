@@ -121,6 +121,7 @@ export interface MonthlyFee {
   amount: number;
   status: PaymentStatus;
   method: PaymentMethod | null;
+  dueDate: string | null;
   paidAt: string | null;
   player?: Player;
 }

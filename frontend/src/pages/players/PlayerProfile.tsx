@@ -220,15 +220,21 @@ export default function PlayerProfile() {
         <CardContent>
           {stats?.monthlyFees.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma mensalidade gerada ainda.</p>}
           <div className="flex flex-col gap-2">
-            {stats?.monthlyFees.map((fee) => (
-              <div key={fee.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm">
-                <span>{fee.referenceMonth}</span>
-                <span className="font-semibold">{formatCurrency(fee.amount)}</span>
-                <Badge variant={fee.status === "PAGO" ? "success" : "outline"}>
-                  {fee.status === "PAGO" ? `Pago (${fee.paidAt ? formatDate(fee.paidAt) : ""})` : "Em aberto"}
-                </Badge>
-              </div>
-            ))}
+            {stats?.monthlyFees.map((fee) => {
+              const overdue = fee.status === "ABERTO" && !!fee.dueDate && new Date(fee.dueDate) < new Date();
+              return (
+                <div key={fee.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm">
+                  <span>
+                    {fee.referenceMonth}
+                    {fee.dueDate && <span className="text-muted-foreground"> · vence {formatDate(fee.dueDate)}</span>}
+                  </span>
+                  <span className="font-semibold">{formatCurrency(fee.amount)}</span>
+                  <Badge variant={fee.status === "PAGO" ? "success" : overdue ? "destructive" : "outline"}>
+                    {fee.status === "PAGO" ? `Pago (${fee.paidAt ? formatDate(fee.paidAt) : ""})` : overdue ? "Atrasada" : "Em aberto"}
+                  </Badge>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
