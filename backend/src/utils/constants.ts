@@ -1,6 +1,6 @@
 export const MONTHLY_FEE_BY_TYPE = {
-  LINHA: 60,
-  GOLEIRO: 30,
+  LINHA: 50,
+  GOLEIRO: 0,
 } as const;
 
 export const GUEST_DEFAULT_FEE = 15;

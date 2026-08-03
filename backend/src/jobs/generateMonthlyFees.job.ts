@@ -5,7 +5,8 @@ import { createNotification } from "../modules/notifications/notifications.servi
 export async function generateMonthlyFees(referenceDate: Date = new Date()) {
   const referenceMonth = `${referenceDate.getFullYear()}-${String(referenceDate.getMonth() + 1).padStart(2, "0")}`;
 
-  const activePlayers = await prisma.player.findMany({ where: { status: "ATIVO" } });
+  // Goleiros não pagam mensalidade.
+  const activePlayers = await prisma.player.findMany({ where: { status: "ATIVO", type: "LINHA" } });
 
   for (const player of activePlayers) {
     const fee = await prisma.monthlyFee.upsert({
