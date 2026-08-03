@@ -10,5 +10,6 @@
   <path d="M256 130 L300 165 L284 218 L228 218 L212 165 Z" fill="#ffffff" />
   <path d="M180 190 L150 250 L190 300" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" />
   <path d="M332 190 L362 250 L322 300" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" />
-  <text x="256" y="420" font-family="Arial, sans-serif" font-size="56" font-weight="800" fill="#ffffff" text-anchor="middle">BECKER</text>
+  <text x="256" y="400" font-family="Arial, sans-serif" font-size="44" font-weight="800" fill="#ffffff" text-anchor="middle">LÁGRIMAS</text>
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="44" font-weight="800" fill="#ffffff" text-anchor="middle">E BOLAS</text>
 </svg>

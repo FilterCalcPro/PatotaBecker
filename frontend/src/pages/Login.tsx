@@ -35,7 +35,7 @@ export default function Login() {
           <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-overall text-white stat-glow">
             <Shield className="h-7 w-7" />
           </div>
-          <CardTitle className="text-2xl">Patota Barbearia Becker</CardTitle>
+          <CardTitle className="text-2xl">Lágrimas e Bolas</CardTitle>
           <CardDescription>Entre com seu e-mail e senha para acessar</CardDescription>
         </CardHeader>
         <CardContent>

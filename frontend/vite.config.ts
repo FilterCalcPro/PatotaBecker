@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["icons/icon.svg"],
       manifest: {
-        name: "Patota Barbearia Becker",
-        short_name: "Becker FC",
-        description: "Gestão da Patota Barbearia Becker",
+        name: "Lágrimas e Bolas",
+        short_name: "Lágrimas e Bolas",
+        description: "Gestão da patota Lágrimas e Bolas",
         theme_color: "#0b0f17",
         background_color: "#0b0f17",
         display: "standalone",

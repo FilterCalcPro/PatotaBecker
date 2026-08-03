@@ -15,8 +15,8 @@ export function Sidebar() {
           <Shield className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-sm font-bold leading-tight">Patota Barbearia</p>
-          <p className="text-xs font-semibold leading-tight text-primary">BECKER</p>
+          <p className="text-sm font-bold leading-tight">Lágrimas</p>
+          <p className="text-xs font-semibold leading-tight text-primary">E BOLAS</p>
         </div>
       </div>
 

@@ -45,7 +45,7 @@ export function Header() {
   });
   const unread = notifications?.filter((n) => !n.read).length ?? 0;
 
-  const title = PAGE_TITLES[location.pathname] ?? "Patota Becker";
+  const title = PAGE_TITLES[location.pathname] ?? "Lágrimas e Bolas";
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-lg lg:px-8">

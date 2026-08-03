@@ -18,8 +18,8 @@ export default function TVPanel() {
             <Shield className="h-8 w-8" />
           </div>
           <div>
-            <p className="text-2xl font-black leading-tight">PATOTA BARBEARIA</p>
-            <p className="text-2xl font-black leading-tight text-emerald-400">BECKER</p>
+            <p className="text-2xl font-black leading-tight">LÁGRIMAS</p>
+            <p className="text-2xl font-black leading-tight text-emerald-400">E BOLAS</p>
           </div>
         </div>
         <div className="flex items-center gap-2 rounded-2xl bg-white/5 px-6 py-3">
